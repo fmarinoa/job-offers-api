@@ -1,7 +1,6 @@
 {
   "name": "job-offers-api",
   "version": "1.0.0",
-  "type": "module",
   "scripts": {
     "dev": "ts-node-dev --respawn src/server.ts",
     "build": "tsc",
@@ -9,11 +8,13 @@
     "lint": "eslint . --ext .ts",
     "format": "prettier --write \"**/*.{ts,js,json,md,yml,yaml}\"",
     "prepare": "husky install",
-    "commit": "git-cz"
+    "commit": "git-cz",
+    "prisma": "prisma generate"
   },
   "dependencies": {
     "@prisma/client": "^5.0.0",
-    "fastify": "^4.0.0"
+    "fastify": "^4.0.0",
+    "joi": "^17.13.3"
   },
   "devDependencies": {
     "@commitlint/cli": "^18.0.0",
