@@ -1,3 +1,5 @@
+import { Types, Document } from 'mongoose';
+
 export interface JobOfferInput {
   titleJob: string;
   employer: string;
@@ -8,4 +10,10 @@ export interface JobOfferInput {
   profileRecruiter?: string;
   descriptionOffer: string;
   linkOffer: string;
+}
+
+export interface JobOfferDocument extends JobOfferInput, Document {
+  _id: Types.ObjectId;
+  createdAt: Date;
+  updatedAt: Date;
 }

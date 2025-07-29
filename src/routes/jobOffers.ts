@@ -1,6 +1,6 @@
 import { FastifyInstance } from 'fastify';
-import { createJobOffer } from '../controllers/jobOffersController';
+import { saveJobOffer } from '../controllers/jobOffersController';
 
 export async function jobOfferRoutes(server: FastifyInstance) {
-  server.post('/', createJobOffer);
+  server.post('/save', saveJobOffer);
 }
