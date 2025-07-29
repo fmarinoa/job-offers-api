@@ -7,7 +7,7 @@
     "build": "tsc",
     "start": "node dist/server.js",
     "lint": "eslint . --ext .ts",
-    "format": "prettier --write .",
+    "format": "prettier --write \"**/*.{ts,js,json,md,yml,yaml}\"",
     "prepare": "husky install",
     "commit": "git-cz"
   },
