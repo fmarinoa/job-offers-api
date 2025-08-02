@@ -8,7 +8,7 @@ export const jobOfferSchema = Joi.object({
   howLongAgo: Joi.string().required(),
   recruiter: Joi.string().allow(''),
   profileRecruiter: Joi.string().allow(''),
-  descriptionOffer: Joi.string().required(),
+  descriptionOffer: Joi.string().required().max(300),
   linkOffer: Joi.string().uri().required(),
 });
 

@@ -1,6 +1,7 @@
+import mongoose from 'mongoose';
+
 import { getMongoUrl } from '../helpers/envs';
 import { Logger } from '../helpers/logger';
-import mongoose from 'mongoose';
 
 export async function connectToMongo() {
   try {

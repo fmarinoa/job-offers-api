@@ -1,4 +1,4 @@
-import { Types, Document } from 'mongoose';
+import { Document, Types } from 'mongoose';
 
 export interface JobOfferInput {
   titleJob: string;

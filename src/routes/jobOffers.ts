@@ -1,4 +1,5 @@
 import { FastifyPluginAsync } from 'fastify';
+
 import { findJobOffer, saveJobOffer } from '../controllers/jobOffersController';
 
 export const jobOfferRoutes: FastifyPluginAsync = async (server) => {

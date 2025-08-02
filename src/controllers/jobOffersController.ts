@@ -1,8 +1,9 @@
-import { FastifyRequest, FastifyReply } from 'fastify';
+import { FastifyReply, FastifyRequest } from 'fastify';
+
+import { buildJobOfferFilters } from '../helpers/buildFilters';
+import { Logger } from '../helpers/logger';
 import { JobOffer } from '../models/JobOffer';
 import { jobOfferQuerySchema, jobOfferSchema } from '../schemas/jobOfferSchema';
-import { Logger } from '../helpers/logger';
-import { buildJobOfferFilters } from '../helpers/buildFilters';
 
 export const saveJobOffer = async (request: FastifyRequest, reply: FastifyReply) => {
   Logger.info('Initiating job offer save process');

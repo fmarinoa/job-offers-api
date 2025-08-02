@@ -1,4 +1,5 @@
-import { Schema, model } from 'mongoose';
+import { model, Schema } from 'mongoose';
+
 import { JobOfferDocument } from '../types/jobOffer';
 
 const jobOfferSchema = new Schema<JobOfferDocument>(

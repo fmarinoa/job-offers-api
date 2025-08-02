@@ -1,8 +1,9 @@
-import Fastify from 'fastify';
 import dotenv from 'dotenv';
-import { registerRoutes } from './routes';
+import Fastify from 'fastify';
+
 import { connectToMongo } from './database/mongo';
 import { Logger } from './helpers/logger';
+import { registerRoutes } from './routes';
 
 dotenv.config();
 const server = Fastify();
