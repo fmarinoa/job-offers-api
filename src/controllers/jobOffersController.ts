@@ -7,8 +7,10 @@ import { jobOfferQuerySchema, jobOfferSchema } from '../schemas/jobOfferSchema';
 
 export const saveJobOffer = async (request: FastifyRequest, reply: FastifyReply) => {
   Logger.info('Initiating job offer save process');
-  Logger.info('Received request to save job offer:', request.body);
   try {
+    if (!request.body) return reply.code(400).send({ error: 'Job offer data is required' });
+    Logger.info('Received request to save job offer:', request.body);
+
     const { error, value } = jobOfferSchema.validate(request.body, { abortEarly: false });
 
     if (error) {
@@ -33,7 +35,8 @@ export const saveJobOffer = async (request: FastifyRequest, reply: FastifyReply)
     });
   } catch (err) {
     return reply.code(500).send({
-      error: `Error saving job offer: ${err instanceof Error ? err.message : 'Unknown error'}`,
+      error: 'Error saving job offer',
+      details: `${err instanceof Error ? err.message : 'Unknown error'}`,
     });
   }
 };
