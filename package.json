@@ -4,7 +4,7 @@
   "scripts": {
     "dev": "nodemon --watch src --ext ts --exec ts-node src/server.ts",
     "build": "tsc",
-    "start": "node dist/src/server.js",
+    "start": "node dist/server.js",
     "lint": "eslint .",
     "prettier": "prettier --write .",
     "prepare": "npx husky install",
