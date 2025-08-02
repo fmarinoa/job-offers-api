@@ -12,7 +12,7 @@ async function start(): Promise<void> {
   await connectToMongo();
 
   try {
-    await registerRoutes(server);
+    await registerRoutes(server, {});
     const address = await server.listen({ port, host: '0.0.0.0' });
     Logger.info(`✅ Server running on ${address}`);
   } catch (error) {

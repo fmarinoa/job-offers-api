@@ -17,3 +17,11 @@ export interface JobOfferDocument extends JobOfferInput, Document {
   createdAt: Date;
   updatedAt: Date;
 }
+
+export type FindJobOfferQuery = {
+  employer?: string;
+  location?: string;
+  page?: number;
+  limit?: number;
+  sort?: 'asc' | 'desc';
+};
