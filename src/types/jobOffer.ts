@@ -19,8 +19,8 @@ export interface JobOfferDocument extends JobOfferInput, Document {
 }
 
 export type FindJobOfferQuery = {
+  titleJob?: string;
   employer?: string;
-  location?: string;
   page?: number;
   limit?: number;
   sort?: 'asc' | 'desc';
