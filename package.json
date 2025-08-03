@@ -5,7 +5,7 @@
     "dev": "nodemon --watch src --ext ts --exec ts-node src/server.ts",
     "build": "tsc",
     "start": "node dist/server.js",
-    "lint": "eslint .",
+    "lint": "eslint . --fix",
     "prettier": "prettier --write .",
     "prepare": "npx husky install",
     "test": "vitest run",
