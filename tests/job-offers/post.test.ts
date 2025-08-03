@@ -1,6 +1,7 @@
 import supertest from 'supertest';
 import { beforeEach, describe, expect, it } from 'vitest';
 
+import { JobOffer } from '../../src/models/JobOffer';
 import { jobOfferIncompleteSchemaTest, jobOfferSchemaTest } from '../helpers/schemas';
 import { getApp } from '../setup';
 
@@ -19,7 +20,7 @@ describe('POST /job-offers/save', () => {
     expect(res.statusCode).toBe(201);
     expect(res.body).toStrictEqual({
       message: 'Job offer saved successfully',
-      id: expect.any(String),
+      id: (await JobOffer.findOne({ titleJob: jobOfferSchemaTest.titleJob }))?._id.toString(),
     });
   });
 
@@ -69,11 +70,10 @@ describe('POST /job-offers/save', () => {
   });
 
   it('Invalid job offer data (extra field:id)', async () => {
-    // CONTEXT
-    const invalidPayload = { ...jobOfferSchemaTest, id: '12345' };
-
     // REQUEST
-    const res = await supertest(app.server).post('/job-offers/save').send(invalidPayload);
+    const res = await supertest(app.server)
+      .post('/job-offers/save')
+      .send({ ...jobOfferSchemaTest, id: '12345' });
 
     // ASSERTS
     expect(res.statusCode).toBe(400);
@@ -82,14 +82,13 @@ describe('POST /job-offers/save', () => {
   });
 
   it('Invalid job offer data (descriptionOffer too long)', async () => {
-    // CONTEXT
-    const invalidPayload = {
-      ...jobOfferSchemaTest,
-      descriptionOffer: 'a'.repeat(301),
-    };
-
     // REQUEST
-    const res = await supertest(app.server).post('/job-offers/save').send(invalidPayload);
+    const res = await supertest(app.server)
+      .post('/job-offers/save')
+      .send({
+        ...jobOfferSchemaTest,
+        descriptionOffer: 'a'.repeat(301),
+      });
 
     // ASSERTS
     expect(res.statusCode).toBe(400);
