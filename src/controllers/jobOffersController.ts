@@ -67,7 +67,8 @@ export const findJobOffer = async (request: FastifyRequest, reply: FastifyReply)
     return reply.code(200).send(offers);
   } catch (err) {
     return reply.code(500).send({
-      error: `Error retrieving job offers: ${err instanceof Error ? err.message : 'Unknown error'}`,
+      error: 'Error retrieving job offers',
+      details: `${err instanceof Error ? err.message : 'Unknown error'}`,
     });
   }
 };
