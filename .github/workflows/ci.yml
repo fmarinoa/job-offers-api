@@ -1,15 +1,12 @@
-name: CI Pipeline
+name: Continuous Integration Pipeline
 
 on:
-  push:
-    branches: [main]
+  pull_request:
+    branches: [main, develop]
 
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
-
-    permissions:
-      deployments: write
 
     steps:
       - name: Checkout repo
@@ -28,13 +25,3 @@ jobs:
 
       - name: Run tests
         run: npm run test:ci
-
-      - name: Deploy to Render
-        uses: JorgeLNJunior/render-deploy@v1.4.5
-        with:
-          service_id: ${{ secrets.RENDER_SERVICE_ID }}
-          api_key: ${{ secrets.RENDER_API_KEY }}
-          clear_cache: true
-          wait_deploy: true
-          github_deployment: true
-          github_token: ${{ secrets.GITHUB_TOKEN }}
