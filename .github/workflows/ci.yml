@@ -8,9 +8,6 @@ jobs:
   build-and-test:
     runs-on: ubuntu-latest
 
-    permissions:
-      deployments: write
-
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
