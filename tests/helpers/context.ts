@@ -1,18 +1,22 @@
 import { JobOffer } from '../../src/models/JobOffer';
 import { jobOfferSchemaTest } from './schemas';
 
-export const setupOffersWithUpdatedAt = async () => {
-  const [offer1, offer2] = await JobOffer.insertMany([
-    { ...jobOfferSchemaTest },
-    { ...jobOfferSchemaTest },
-  ]);
+export async function setupOffers(count: number) {
+  return JobOffer.insertMany(Array.from({ length: count }, () => ({ ...jobOfferSchemaTest })));
+}
 
-  await JobOffer.findByIdAndUpdate(offer1._id, {
-    $set: { updatedAt: new Date('2023-01-01T00:00:00Z') },
-  });
-  await JobOffer.findByIdAndUpdate(offer2._id, {
-    $set: { updatedAt: new Date('2024-01-01T00:00:00Z') },
-  });
+export async function setupOffersWithUpdatedAt(
+  updatedAtDates: Date[] = [new Date('2023-01-01T00:00:00Z'), new Date('2024-01-01T00:00:00Z')]
+) {
+  const offers = await setupOffers(updatedAtDates.length);
 
-  return { offer1, offer2 };
-};
+  return await Promise.all(
+    offers.map((offer, index) =>
+      JobOffer.findByIdAndUpdate(
+        offer._id,
+        { $set: { updatedAt: updatedAtDates[index] } },
+        { new: true, timestamps: false }
+      )
+    )
+  );
+}

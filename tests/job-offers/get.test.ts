@@ -2,7 +2,7 @@ import supertest from 'supertest';
 import { beforeEach, describe, expect, it } from 'vitest';
 
 import { JobOffer } from '../../src/models/JobOffer';
-import { setupOffersWithUpdatedAt } from '../helpers/context';
+import { setupOffers, setupOffersWithUpdatedAt } from '../helpers/context';
 import { jobOfferSchemaTest } from '../helpers/schemas';
 import { getApp } from '../setup';
 
@@ -45,7 +45,7 @@ describe('GET /job-offers', () => {
 
   it('Return the second page empty because there are only 10 records', async () => {
     // CONTEXT
-    await Promise.all(Array.from({ length: 10 }, () => JobOffer.create(jobOfferSchemaTest)));
+    await setupOffers(10);
 
     // REQUEST
     const res = await supertest(app.server).get('/job-offers?page=2');
@@ -90,7 +90,7 @@ describe('GET /job-offers', () => {
 
   it('Should return only one job offer when limit=1', async () => {
     // CONTEXT
-    await Promise.all(Array.from({ length: 2 }, () => JobOffer.create(jobOfferSchemaTest)));
+    await setupOffers(2);
 
     // REQUEST
     const res = await supertest(app.server).get('/job-offers?limit=1');
@@ -127,5 +127,53 @@ describe('GET /job-offers', () => {
     expect(res.body.length).toBe(2);
     const [firstUpdatedAt, secondUpdatedAt] = [res.body[0].updatedAt, res.body[1].updatedAt];
     expect(new Date(firstUpdatedAt).getTime() < new Date(secondUpdatedAt).getTime()).toBe(true);
+  });
+
+  it('Should return filtered job offer by employer', async () => {
+    // CONTEXT
+    const newEmployer = 'Test Employer 1';
+
+    await JobOffer.insertMany([
+      { ...jobOfferSchemaTest },
+      { ...jobOfferSchemaTest, employer: newEmployer },
+    ]);
+
+    const expectedOffer = await JobOffer.findOne({ employer: newEmployer });
+
+    // REQUEST
+    const res = await supertest(app.server).get('/job-offers?employer=Test Employer 1');
+
+    // ASSERTS
+    expect(res.statusCode).toBe(200);
+    expect(res.body.length).toBe(1);
+    expect(res.body).toEqual([
+      expect.objectContaining({
+        _id: expectedOffer?._id.toString(),
+        titleJob: expectedOffer?.titleJob,
+        employer: expectedOffer?.employer,
+        linkProfileEmployer: expectedOffer?.linkProfileEmployer,
+        location: expectedOffer?.location,
+        howLongAgo: expectedOffer?.howLongAgo,
+        recruiter: expectedOffer?.recruiter,
+        profileRecruiter: expectedOffer?.profileRecruiter,
+        descriptionOffer: expectedOffer?.descriptionOffer,
+        linkOffer: expectedOffer?.linkOffer,
+        createdAt: expectedOffer?.createdAt.toISOString(),
+        updatedAt: expectedOffer?.updatedAt.toISOString(),
+        __v: expectedOffer?.__v,
+      }),
+    ]);
+  });
+
+  it('Should return 404 when no job offers match the employer filter', async () => {
+    // CONTEXT
+    await setupOffers(1);
+
+    // REQUEST
+    const res = await supertest(app.server).get('/job-offers?employer=unexisting');
+
+    // ASSERTS
+    expect(res.statusCode).toBe(404);
+    expect(res.body.message).toBe('No job offers found');
   });
 });
