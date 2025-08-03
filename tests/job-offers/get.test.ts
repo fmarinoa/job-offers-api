@@ -176,4 +176,52 @@ describe('GET /job-offers', () => {
     expect(res.statusCode).toBe(404);
     expect(res.body.message).toBe('No job offers found');
   });
+
+  it('Should return filtered job offer by title job', async () => {
+    // CONTEXT
+    const newTitleJob = 'Test Title Job 1';
+
+    await JobOffer.insertMany([
+      { ...jobOfferSchemaTest },
+      { ...jobOfferSchemaTest, titleJob: newTitleJob },
+    ]);
+
+    const expectedOffer = await JobOffer.findOne({ titleJob: newTitleJob });
+
+    // REQUEST
+    const res = await supertest(app.server).get('/job-offers?titleJob=Test Title Job 1');
+
+    // ASSERTS
+    expect(res.statusCode).toBe(200);
+    expect(res.body.length).toBe(1);
+    expect(res.body).toEqual([
+      expect.objectContaining({
+        _id: expectedOffer?._id.toString(),
+        titleJob: expectedOffer?.titleJob,
+        employer: expectedOffer?.employer,
+        linkProfileEmployer: expectedOffer?.linkProfileEmployer,
+        location: expectedOffer?.location,
+        howLongAgo: expectedOffer?.howLongAgo,
+        recruiter: expectedOffer?.recruiter,
+        profileRecruiter: expectedOffer?.profileRecruiter,
+        descriptionOffer: expectedOffer?.descriptionOffer,
+        linkOffer: expectedOffer?.linkOffer,
+        createdAt: expectedOffer?.createdAt.toISOString(),
+        updatedAt: expectedOffer?.updatedAt.toISOString(),
+        __v: expectedOffer?.__v,
+      }),
+    ]);
+  });
+
+  it('Should return 404 when no job offers match the title job filter', async () => {
+    // CONTEXT
+    await setupOffers(1);
+
+    // REQUEST
+    const res = await supertest(app.server).get('/job-offers?titleJob=unexisting');
+
+    // ASSERTS
+    expect(res.statusCode).toBe(404);
+    expect(res.body.message).toBe('No job offers found');
+  });
 });

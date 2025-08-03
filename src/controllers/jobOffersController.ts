@@ -52,9 +52,9 @@ export const findJobOffer = async (request: FastifyRequest, reply: FastifyReply)
         details: error.details.map((d) => d.message),
       });
 
-    const { employer, location, page = 1, limit = 10, sort = 'desc' } = value;
+    const { titleJob, employer, page = 1, limit = 10, sort = 'desc' } = value;
     const skip = (page - 1) * limit;
-    const filters = buildJobOfferFilters({ employer, location });
+    const filters = buildJobOfferFilters({ titleJob, employer });
 
     const offers = await JobOffer.find(filters)
       .sort({ updatedAt: sort === 'asc' ? 1 : -1 })
