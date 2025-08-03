@@ -6,7 +6,7 @@ import globals from 'globals';
 
 export default [
   {
-    files: ['**/*.ts', '**/*.js', '**/*.yml', '**/*.yaml'],
+    files: ['**/*.ts', '**/*.js'],
     ignores: ['dist/**', 'node_modules/**'],
     languageOptions: {
       parser: parserTs,
