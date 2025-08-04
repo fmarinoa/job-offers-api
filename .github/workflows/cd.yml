@@ -6,10 +6,20 @@ on:
 
 jobs:
   deploy:
+    runs-on: ubuntu-latest
+
     permissions:
       deployments: write
 
     steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Use Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
       - name: Deploy to Render
         uses: JorgeLNJunior/render-deploy@v1.4.5
         with:
