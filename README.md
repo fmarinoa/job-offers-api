@@ -110,7 +110,7 @@ Contributions are welcome! Follow these steps:
 
 ## 📄 License
 
-This project is licensed under the MIT License.
+This project is licensed under the [MIT License](https://github.com/fmarinoa/job-offers-api?tab=MIT-1-ov-file).
 
 ---
 
