@@ -11,7 +11,7 @@ const jobOfferSchema = new Schema<JobOfferDocument>(
     howLongAgo: { type: String, required: true },
     recruiter: { type: String },
     profileRecruiter: { type: String },
-    descriptionOffer: { type: String, required: true },
+    descriptionOffer: { type: String, maxlength: 300 },
     linkOffer: { type: String, required: true },
   },
   { timestamps: true }

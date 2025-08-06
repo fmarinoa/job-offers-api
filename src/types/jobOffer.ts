@@ -8,7 +8,7 @@ export interface JobOfferInput {
   howLongAgo: string;
   recruiter?: string;
   profileRecruiter?: string;
-  descriptionOffer: string;
+  descriptionOffer?: string;
   linkOffer: string;
 }
 

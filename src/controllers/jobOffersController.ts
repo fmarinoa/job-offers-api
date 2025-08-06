@@ -7,26 +7,32 @@ import { jobOfferQuerySchema, jobOfferSchema } from '../schemas/jobOfferSchema';
 
 export const saveJobOffer = async (request: FastifyRequest, reply: FastifyReply) => {
   Logger.info('Initiating job offer save process');
+
   try {
     if (!request.body) return reply.code(400).send({ error: 'Job offer data is required' });
+
     Logger.info('Received request to save job offer:', request.body);
 
     const { error, value } = jobOfferSchema.validate(request.body, { abortEarly: false });
 
-    if (error) {
+    if (error)
       return reply.code(400).send({
         error: 'Validation failed',
         details: error.details.map((d) => d.message),
       });
-    }
+
     Logger.info('Validated job offer data');
 
     const saved = await new JobOffer(value).save();
+
     if (!saved) return reply.code(500).send({ error: 'Failed to save job offer' });
+
     Logger.info('Job offer saved successfully:', saved);
 
     const id = saved._id.toString();
+
     if (!id) return reply.code(500).send({ error: 'Failed to retrieve job offer ID' });
+
     Logger.info(`Job offer saved with ID: ${id}`);
 
     return reply.code(201).send({
@@ -43,6 +49,7 @@ export const saveJobOffer = async (request: FastifyRequest, reply: FastifyReply)
 
 export const findJobOffer = async (request: FastifyRequest, reply: FastifyReply) => {
   Logger.info('Initiating find job offer process');
+
   try {
     const { error, value } = jobOfferQuerySchema.validate(request.query, { abortEarly: false });
 
@@ -64,6 +71,7 @@ export const findJobOffer = async (request: FastifyRequest, reply: FastifyReply)
     if (!offers.length) return reply.code(404).send({ message: 'No job offers found' });
 
     Logger.info(`Job offers retrieved successfully: ${offers.length}`);
+
     return reply.code(200).send(offers);
   } catch (err) {
     return reply.code(500).send({
