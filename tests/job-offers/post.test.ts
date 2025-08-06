@@ -24,6 +24,26 @@ describe('POST /job-offers/save', () => {
     });
   });
 
+  it('should save job offer even if optional fields are empty strings', async () => {
+    // PREPARE
+    const payload = {
+      ...jobOfferSchemaTest,
+      recruiter: '',
+      profileRecruiter: '',
+      descriptionOffer: '',
+    };
+
+    // REQUEST
+    const res = await supertest(app.server).post('/job-offers/save').send(payload);
+
+    // ASSERTS
+    expect(res.statusCode).toBe(201);
+    expect(res.body).toStrictEqual({
+      message: 'Job offer saved successfully',
+      id: (await JobOffer.findOne({ titleJob: jobOfferSchemaTest.titleJob }))?._id.toString(),
+    });
+  });
+
   it('Missing required field', async () => {
     // REQUEST
     const res = await supertest(app.server)
@@ -37,7 +57,6 @@ describe('POST /job-offers/save', () => {
       '"linkProfileEmployer" is required',
       '"location" is required',
       '"howLongAgo" is required',
-      '"descriptionOffer" is required',
       '"linkOffer" is required',
     ]);
   });
@@ -64,16 +83,16 @@ describe('POST /job-offers/save', () => {
       '"linkProfileEmployer" is required',
       '"location" is required',
       '"howLongAgo" is required',
-      '"descriptionOffer" is required',
       '"linkOffer" is required',
     ]);
   });
 
   it('Invalid job offer data (extra field:id)', async () => {
+    // PREPARE
+    const invalidPayload = { ...jobOfferSchemaTest, id: '12345' };
+
     // REQUEST
-    const res = await supertest(app.server)
-      .post('/job-offers/save')
-      .send({ ...jobOfferSchemaTest, id: '12345' });
+    const res = await supertest(app.server).post('/job-offers/save').send(invalidPayload);
 
     // ASSERTS
     expect(res.statusCode).toBe(400);
@@ -82,13 +101,11 @@ describe('POST /job-offers/save', () => {
   });
 
   it('Invalid job offer data (descriptionOffer too long)', async () => {
+    // PREPARE
+    const invalidPayload = { ...jobOfferSchemaTest, descriptionOffer: 'a'.repeat(301) };
+
     // REQUEST
-    const res = await supertest(app.server)
-      .post('/job-offers/save')
-      .send({
-        ...jobOfferSchemaTest,
-        descriptionOffer: 'a'.repeat(301),
-      });
+    const res = await supertest(app.server).post('/job-offers/save').send(invalidPayload);
 
     // ASSERTS
     expect(res.statusCode).toBe(400);

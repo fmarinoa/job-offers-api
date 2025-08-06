@@ -6,9 +6,9 @@ export const jobOfferSchema = Joi.object({
   linkProfileEmployer: Joi.string().uri().required(),
   location: Joi.string().required(),
   howLongAgo: Joi.string().required(),
-  recruiter: Joi.string().allow(''),
-  profileRecruiter: Joi.string().allow(''),
-  descriptionOffer: Joi.string().required().max(300),
+  recruiter: Joi.string().optional().allow(''),
+  profileRecruiter: Joi.string().optional().allow(''),
+  descriptionOffer: Joi.string().optional().allow('').max(300),
   linkOffer: Joi.string().uri().required(),
 });
 
