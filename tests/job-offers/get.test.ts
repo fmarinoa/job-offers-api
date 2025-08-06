@@ -22,7 +22,10 @@ describe('GET /job-offers', () => {
 
     // ASSERTS
     expect(res.statusCode).toBe(200);
-    expect(res.body).toEqual(
+    expect(res.body.page).toBe(1);
+    expect(res.body.total).toBe(1);
+    expect(res.body.totalPages).toBe(1);
+    expect(res.body.results).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
           _id: jobOffer._id.toString(),
@@ -51,8 +54,13 @@ describe('GET /job-offers', () => {
     const res = await supertest(app.server).get('/job-offers?page=2');
 
     // ASSERTS
-    expect(res.statusCode).toBe(404);
-    expect(res.body.message).toBe('No job offers found');
+    expect(res.statusCode).toBe(200);
+    expect(res.body).toEqual({
+      total: 10,
+      page: 2,
+      totalPages: 1,
+      results: [],
+    });
   });
 
   it('Returns empty array initially', async () => {
@@ -60,8 +68,13 @@ describe('GET /job-offers', () => {
     const res = await supertest(app.server).get('/job-offers');
 
     // ASSERTS
-    expect(res.statusCode).toBe(404);
-    expect(res.body.message).toBe('No job offers found');
+    expect(res.statusCode).toBe(200);
+    expect(res.body).toEqual({
+      total: 0,
+      page: 1,
+      totalPages: 0,
+      results: [],
+    });
   });
 
   it('Returns error for invalid query parameter', async () => {
@@ -97,8 +110,27 @@ describe('GET /job-offers', () => {
 
     // ASSERTS
     expect(res.statusCode).toBe(200);
-    expect(Array.isArray(res.body)).toBe(true);
-    expect(res.body.length).toBe(1);
+    expect(res.body.total).toBe(2);
+    expect(res.body.page).toBe(1);
+    expect(res.body.totalPages).toBe(2);
+    expect(Array.isArray(res.body.results)).toBe(true);
+    expect(res.body.results.length).toBe(1);
+  });
+
+  it('Should return only one job offer when limit=1 and page=2', async () => {
+    // CONTEXT
+    await setupOffers(2);
+
+    // REQUEST
+    const res = await supertest(app.server).get('/job-offers?limit=1&page=2');
+
+    // ASSERTS
+    expect(res.statusCode).toBe(200);
+    expect(res.body.total).toBe(2);
+    expect(res.body.page).toBe(2);
+    expect(res.body.totalPages).toBe(2);
+    expect(Array.isArray(res.body.results)).toBe(true);
+    expect(res.body.results.length).toBe(1);
   });
 
   it('Should return job offers sorted in descending order by updatedAt', async () => {
@@ -109,9 +141,14 @@ describe('GET /job-offers', () => {
     const res = await supertest(app.server).get('/job-offers?sort=desc');
 
     // ASSERTS
+    const [firstUpdatedAt, secondUpdatedAt] = [
+      res.body.results[0].updatedAt,
+      res.body.results[1].updatedAt,
+    ];
     expect(res.statusCode).toBe(200);
-    expect(res.body.length).toBe(2);
-    const [firstUpdatedAt, secondUpdatedAt] = [res.body[0].updatedAt, res.body[1].updatedAt];
+    expect(res.body.total).toBe(2);
+    expect(res.body.page).toBe(1);
+    expect(res.body.totalPages).toBe(1);
     expect(new Date(firstUpdatedAt).getTime() > new Date(secondUpdatedAt).getTime()).toBe(true);
   });
 
@@ -123,9 +160,14 @@ describe('GET /job-offers', () => {
     const res = await supertest(app.server).get('/job-offers?sort=asc');
 
     // ASSERTS
+    const [firstUpdatedAt, secondUpdatedAt] = [
+      res.body.results[0].updatedAt,
+      res.body.results[1].updatedAt,
+    ];
     expect(res.statusCode).toBe(200);
-    expect(res.body.length).toBe(2);
-    const [firstUpdatedAt, secondUpdatedAt] = [res.body[0].updatedAt, res.body[1].updatedAt];
+    expect(res.body.total).toBe(2);
+    expect(res.body.page).toBe(1);
+    expect(res.body.totalPages).toBe(1);
     expect(new Date(firstUpdatedAt).getTime() < new Date(secondUpdatedAt).getTime()).toBe(true);
   });
 
@@ -145,8 +187,10 @@ describe('GET /job-offers', () => {
 
     // ASSERTS
     expect(res.statusCode).toBe(200);
-    expect(res.body.length).toBe(1);
-    expect(res.body).toEqual([
+    expect(res.body.total).toBe(1);
+    expect(res.body.page).toBe(1);
+    expect(res.body.totalPages).toBe(1);
+    expect(res.body.results).toEqual([
       expect.objectContaining({
         _id: expectedOffer?._id.toString(),
         titleJob: expectedOffer?.titleJob,
@@ -165,7 +209,7 @@ describe('GET /job-offers', () => {
     ]);
   });
 
-  it('Should return 404 when no job offers match the employer filter', async () => {
+  it('Should return when no job offers match the employer filter', async () => {
     // CONTEXT
     await setupOffers(1);
 
@@ -173,8 +217,11 @@ describe('GET /job-offers', () => {
     const res = await supertest(app.server).get('/job-offers?employer=unexisting');
 
     // ASSERTS
-    expect(res.statusCode).toBe(404);
-    expect(res.body.message).toBe('No job offers found');
+    expect(res.statusCode).toBe(200);
+    expect(res.body.total).toBe(0);
+    expect(res.body.page).toBe(1);
+    expect(res.body.totalPages).toBe(0);
+    expect(res.body.results).toEqual([]);
   });
 
   it('Should return filtered job offer by title job', async () => {
@@ -193,8 +240,10 @@ describe('GET /job-offers', () => {
 
     // ASSERTS
     expect(res.statusCode).toBe(200);
-    expect(res.body.length).toBe(1);
-    expect(res.body).toEqual([
+    expect(res.body.total).toBe(1);
+    expect(res.body.page).toBe(1);
+    expect(res.body.totalPages).toBe(1);
+    expect(res.body.results).toEqual([
       expect.objectContaining({
         _id: expectedOffer?._id.toString(),
         titleJob: expectedOffer?.titleJob,
@@ -213,7 +262,7 @@ describe('GET /job-offers', () => {
     ]);
   });
 
-  it('Should return 404 when no job offers match the title job filter', async () => {
+  it('Should return when no job offers match the title job filter', async () => {
     // CONTEXT
     await setupOffers(1);
 
@@ -221,7 +270,10 @@ describe('GET /job-offers', () => {
     const res = await supertest(app.server).get('/job-offers?titleJob=unexisting');
 
     // ASSERTS
-    expect(res.statusCode).toBe(404);
-    expect(res.body.message).toBe('No job offers found');
+    expect(res.statusCode).toBe(200);
+    expect(res.body.total).toBe(0);
+    expect(res.body.page).toBe(1);
+    expect(res.body.totalPages).toBe(0);
+    expect(res.body.results).toEqual([]);
   });
 });
