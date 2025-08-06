@@ -63,20 +63,28 @@ export const findJobOffer = async (request: FastifyRequest, reply: FastifyReply)
     const skip = (page - 1) * limit;
     const filters = buildJobOfferFilters({ titleJob, employer });
 
-    const offers = await JobOffer.find(filters)
-      .sort({ updatedAt: sort === 'asc' ? 1 : -1 })
-      .skip(skip)
-      .limit(limit);
+    const [offers, total] = await Promise.all([
+      JobOffer.find(filters)
+        .sort({ updatedAt: sort === 'asc' ? 1 : -1 })
+        .skip(skip)
+        .limit(limit),
+      JobOffer.countDocuments(filters),
+    ]);
 
-    if (!offers.length) return reply.code(404).send({ message: 'No job offers found' });
+    const totalPages = Math.ceil(total / limit);
 
-    Logger.info(`Job offers retrieved successfully: ${offers.length}`);
+    Logger.info(`Job offers retrieved: ${offers.length} of ${total}`);
 
-    return reply.code(200).send(offers);
+    return reply.code(200).send({
+      total,
+      page,
+      totalPages,
+      results: offers,
+    });
   } catch (err) {
     return reply.code(500).send({
       error: 'Error retrieving job offers',
-      details: `${err instanceof Error ? err.message : 'Unknown error'}`,
+      details: err instanceof Error ? err.message : 'Unknown error',
     });
   }
 };
