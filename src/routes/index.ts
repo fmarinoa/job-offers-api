@@ -1,7 +1,7 @@
-import { FastifyPluginAsync } from 'fastify';
+import { FastifyInstance } from 'fastify';
 
 import { jobOfferRoutes } from './jobOffers';
 
-export const registerRoutes: FastifyPluginAsync = async (server) => {
-  server.register(jobOfferRoutes, { prefix: '/job-offers' });
-};
+export async function registerRoutes(server: FastifyInstance): Promise<void> {
+  await server.register(jobOfferRoutes, { prefix: '/job-offers' });
+}
