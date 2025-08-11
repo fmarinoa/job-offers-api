@@ -25,3 +25,14 @@ export type FindJobOfferQuery = {
   limit?: number;
   sort?: 'asc' | 'desc';
 };
+
+export type BuildFilter = {
+  employer?: {
+    $regex: string;
+    $options: string;
+  };
+  titleJob?: {
+    $regex: string;
+    $options: string;
+  };
+};

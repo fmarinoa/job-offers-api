@@ -1,23 +1,24 @@
 import dotenv from 'dotenv';
-import Fastify from 'fastify';
+dotenv.config();
 
+import { getServer, registerCors } from './config';
 import { connectToMongo } from './database/mongo';
-import { Logger } from './helpers/logger';
+import { getPort } from './helpers/envs';
 import { registerRoutes } from './routes';
 
-dotenv.config();
-const server = Fastify();
-const port: number = Number(process.env.PORT) || 3000;
+const server = getServer();
+const port: number = getPort(3000);
 
 async function start(): Promise<void> {
-  await connectToMongo();
-
   try {
-    await registerRoutes(server, {});
-    const address = await server.listen({ port, host: '0.0.0.0' });
-    Logger.info(`✅ Server running on ${address}`);
+    await connectToMongo();
+    await registerCors(server);
+    await registerRoutes(server);
+
+    await server.ready();
+    await server.listen({ port, host: '0.0.0.0' });
   } catch (error) {
-    Logger.error('❌ Error starting server:', error);
+    server.log.error({ err: error }, 'Error starting server');
     process.exit(1);
   }
 }
