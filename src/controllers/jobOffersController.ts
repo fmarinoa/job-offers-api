@@ -5,7 +5,10 @@ import { JobOffer } from '../models/JobOffer';
 import { jobOfferQuerySchema, jobOfferSchema } from '../schemas/jobOfferSchema';
 import { BuildFilter } from '../types/jobOffer';
 
-export const saveJobOffer = async (request: FastifyRequest, reply: FastifyReply) => {
+export const saveJobOffer = async (
+  request: FastifyRequest,
+  reply: FastifyReply
+): Promise<never> => {
   try {
     if (!request.body) return reply.code(400).send({ error: 'Job offer data is required' });
 
@@ -37,7 +40,10 @@ export const saveJobOffer = async (request: FastifyRequest, reply: FastifyReply)
   }
 };
 
-export const findJobOffer = async (request: FastifyRequest, reply: FastifyReply) => {
+export const findJobOffer = async (
+  request: FastifyRequest,
+  reply: FastifyReply
+): Promise<never> => {
   try {
     const { error, value } = jobOfferQuerySchema.validate(request.query, { abortEarly: false });
 
