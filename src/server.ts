@@ -1,13 +1,15 @@
 import dotenv from 'dotenv';
-dotenv.config();
+import { FastifyInstance } from 'fastify';
 
 import { getServer, registerCors } from './config';
 import { connectToMongo } from './database/mongo';
 import { getPort } from './helpers/envs';
 import { registerRoutes } from './routes';
 
-const server = getServer();
-const port: number = getPort(3000);
+dotenv.config();
+
+const server: FastifyInstance = getServer();
+const port = getPort(3000);
 
 async function start(): Promise<void> {
   try {
@@ -23,4 +25,4 @@ async function start(): Promise<void> {
   }
 }
 
-start();
+void start();
