@@ -1,4 +1,4 @@
-import Fastify from 'fastify';
+import Fastify, { FastifyInstance } from 'fastify';
 import { MongoMemoryServer } from 'mongodb-memory-server';
 import mongoose from 'mongoose';
 import { afterAll, afterEach, beforeAll, beforeEach } from 'vitest';
@@ -6,7 +6,7 @@ import { afterAll, afterEach, beforeAll, beforeEach } from 'vitest';
 import { registerRoutes } from '../src/routes';
 
 let mongo: MongoMemoryServer;
-let app: ReturnType<typeof Fastify>;
+let app: FastifyInstance;
 
 beforeAll(async () => {
   mongo = await MongoMemoryServer.create();
