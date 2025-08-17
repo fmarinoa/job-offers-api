@@ -1,3 +1,5 @@
+import { readFileSync } from 'fs';
+import { join } from 'path';
 import supertest from 'supertest';
 import { beforeEach, describe, expect, it } from 'vitest';
 
@@ -10,6 +12,30 @@ let app: ReturnType<typeof getApp>;
 
 beforeEach(() => {
   app = getApp();
+});
+
+describe('GET /status', () => {
+  it('Return status info', async () => {
+    // CONTEXT
+    const { version, name } = JSON.parse(
+      readFileSync(join(process.cwd(), 'package.json'), 'utf-8')
+    );
+    const uptime = process.uptime().toFixed(0);
+
+    // REQUEST
+    const res = await supertest(app.server).get('/status');
+
+    // ASSERTS
+    expect(res.statusCode).toBe(200);
+    expect(res.body).toEqual({
+      status: '👍',
+      service: name,
+      version: version,
+      uptime: `${uptime}s`,
+      env: 'test',
+      timestamp: expect.any(String),
+    });
+  });
 });
 
 describe('GET /job-offers', () => {
