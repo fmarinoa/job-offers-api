@@ -1,5 +1,6 @@
 import { FastifyReply, FastifyRequest } from 'fastify';
 import { readFileSync } from 'fs';
+import { StatusCodes } from 'http-status-codes';
 import { join } from 'path';
 
 import { getEnv } from '../helpers/envs';
@@ -10,7 +11,7 @@ export const landingInfo = async (
   _request: FastifyRequest,
   reply: FastifyReply
 ): Promise<never> => {
-  return reply.code(200).type('text/html').send(`
+  return reply.code(StatusCodes.OK).type('text/html').send(`
       <!DOCTYPE html>
       <html lang="en">
       <head>
@@ -60,7 +61,7 @@ export const status = async (_request: FastifyRequest, reply: FastifyReply): Pro
   const uptime = process.uptime().toFixed(0);
   const env = getEnv();
 
-  return reply.code(200).send({
+  return reply.code(StatusCodes.OK).send({
     status: '👍',
     service: name,
     version,
