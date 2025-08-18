@@ -1,11 +1,5 @@
-export const getMongoUrl = (fallback?: string): string | undefined => {
-  return String(process.env.MONGO_URL) || fallback;
-};
+export const getMongoUrl = (): string => String(process.env.MONGO_URL);
 
-export const getPort = (fallback?: number): number | undefined => {
-  return Number(process.env.PORT) || fallback;
-};
+export const getPort = (): number => Number(process.env.PORT);
 
-export const getEnv = (fallback?: string): string | undefined => {
-  return String(process.env.NODE_ENV) || fallback;
-};
+export const getEnv = (): string => String(process.env.NODE_ENV);
