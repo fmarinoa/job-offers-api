@@ -9,7 +9,7 @@ import { registerRoutes } from './routes';
 dotenv.config();
 
 const server: FastifyInstance = getServer();
-const port = getPort(3000);
+const port = getPort() || 3000;
 
 async function start(): Promise<void> {
   try {

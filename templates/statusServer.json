@@ -1,0 +1,8 @@
+{
+  "status": "👍",
+  "service": "${name}",
+  "version": "${version}",
+  "uptime": "${uptime}s",
+  "env": "${env}",
+  "timestamp": "${currentTime}"
+}
