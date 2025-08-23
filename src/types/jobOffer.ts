@@ -24,15 +24,12 @@ export type FindJobOfferQuery = {
   page?: number;
   limit?: number;
   sort?: 'asc' | 'desc';
+  days?: number;
 };
 
 export type BuildFilter = {
-  employer?: {
-    $regex: string;
-    $options: string;
-  };
-  titleJob?: {
-    $regex: string;
-    $options: string;
-  };
+  employer?: { $regex: string; $options: string };
+  titleJob?: { $regex: string; $options: string };
+  createdAt?: { $gte: Date };
 };
+
