@@ -1,9 +1,9 @@
 import supertest from 'supertest';
 import { beforeEach, describe, expect, it } from 'vitest';
 
-import { JobOffer } from '../../src/models/JobOffer';
-import { jobOfferIncompleteSchemaTest, jobOfferSchemaTest } from '../helpers/schemas';
-import { getApp } from '../setup';
+import { JobOffer } from '../../../src/models/JobOffer';
+import { jobOfferSchemaTest } from '../../helpers/schemas';
+import { getApp } from '../../setup';
 
 let app: ReturnType<typeof getApp>;
 
@@ -46,14 +46,15 @@ describe('POST /job-offers/save', () => {
 
   it('Missing required field', async () => {
     // REQUEST
-    const res = await supertest(app.server)
-      .post('/job-offers/save')
-      .send(jobOfferIncompleteSchemaTest);
+    const res = await supertest(app.server).post('/job-offers/save').send({});
 
     // ASSERTS
     expect(res.statusCode).toBe(400);
-    expect(res.body.error).toBe('Validation failed');
+    expect(res.body.code).toBe('ERROR_VALIDATE_SCHEMA');
+    expect(res.body.message).toBe('Failed to validate schema of Joi');
     expect(res.body.details).toEqual([
+      '"titleJob" is required',
+      '"employer" is required',
       '"linkProfileEmployer" is required',
       '"location" is required',
       '"howLongAgo" is required',
@@ -67,7 +68,9 @@ describe('POST /job-offers/save', () => {
 
     // ASSERTS
     expect(res.statusCode).toBe(400);
-    expect(res.body.error).toBe('Job offer data is required');
+    expect(res.body.code).toBe('ERROR_MISSING_BODY');
+    expect(res.body.message).toBe('Missing request body');
+    expect(res.body.details).toEqual([]);
   });
 
   it('Invalid job offer data', async () => {
@@ -76,7 +79,8 @@ describe('POST /job-offers/save', () => {
 
     // ASSERTS
     expect(res.statusCode).toBe(400);
-    expect(res.body.error).toBe('Validation failed');
+    expect(res.body.code).toBe('ERROR_VALIDATE_SCHEMA');
+    expect(res.body.message).toBe('Failed to validate schema of Joi');
     expect(res.body.details).toEqual([
       '"titleJob" is required',
       '"employer" is required',
@@ -96,7 +100,8 @@ describe('POST /job-offers/save', () => {
 
     // ASSERTS
     expect(res.statusCode).toBe(400);
-    expect(res.body.error).toBe('Validation failed');
+    expect(res.body.code).toBe('ERROR_VALIDATE_SCHEMA');
+    expect(res.body.message).toBe('Failed to validate schema of Joi');
     expect(res.body.details).toEqual(['"id" is not allowed']);
   });
 
@@ -109,7 +114,8 @@ describe('POST /job-offers/save', () => {
 
     // ASSERTS
     expect(res.statusCode).toBe(400);
-    expect(res.body.error).toBe('Validation failed');
+    expect(res.body.code).toBe('ERROR_VALIDATE_SCHEMA');
+    expect(res.body.message).toBe('Failed to validate schema of Joi');
     expect(res.body.details).toEqual([
       '"descriptionOffer" length must be less than or equal to 300 characters long',
     ]);

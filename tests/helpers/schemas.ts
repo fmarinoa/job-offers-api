@@ -9,8 +9,3 @@ export const jobOfferSchemaTest = {
   descriptionOffer: 'This is a test job offer description.',
   linkOffer: 'https://example.com/job-offer',
 };
-
-export const jobOfferIncompleteSchemaTest = {
-  titleJob: 'Test Job Offer',
-  employer: 'Test Employer',
-};

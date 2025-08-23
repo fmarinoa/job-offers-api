@@ -1,8 +1,9 @@
-import Fastify, { FastifyInstance } from 'fastify';
+import { FastifyInstance } from 'fastify';
 import { MongoMemoryServer } from 'mongodb-memory-server';
 import mongoose from 'mongoose';
 import { afterAll, afterEach, beforeAll, beforeEach } from 'vitest';
 
+import { createServer } from '../src/config';
 import { registerRoutes } from '../src/routes';
 
 let mongo: MongoMemoryServer;
@@ -15,7 +16,7 @@ beforeAll(async () => {
 });
 
 beforeEach(async () => {
-  app = Fastify();
+  app = createServer();
   await app.register(registerRoutes);
   await app.ready();
 });
@@ -37,4 +38,4 @@ afterEach(async () => {
   );
 });
 
-export const getApp = () => app;
+export const getApp = (): FastifyInstance => app;
