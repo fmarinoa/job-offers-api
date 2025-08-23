@@ -15,7 +15,8 @@ export const jobOfferSchema = Joi.object({
 export const jobOfferQuerySchema = Joi.object({
   titleJob: Joi.string().optional(),
   employer: Joi.string().optional(),
-  page: Joi.number().integer().min(1).optional(),
-  limit: Joi.number().integer().min(1).max(100).optional(),
-  sort: Joi.string().valid('asc', 'desc').optional(),
+  page: Joi.number().integer().min(1).optional().default(1),
+  limit: Joi.number().integer().min(1).max(100).optional().default(10),
+  sort: Joi.string().valid('asc', 'desc').optional().default('desc'),
+  days: Joi.number().integer().min(1).optional(),
 });

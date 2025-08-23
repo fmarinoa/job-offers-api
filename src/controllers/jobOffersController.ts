@@ -2,89 +2,66 @@ import { FastifyReply, FastifyRequest } from 'fastify';
 import { StatusCodes } from 'http-status-codes';
 
 import { buildJobOfferFilters } from '../helpers/buildFilters';
+import {
+  GetIdError,
+  MissingBodyError,
+  SaveOfferError,
+  ValidateSchemaError,
+} from '../helpers/errors';
 import { JobOffer } from '../models/JobOffer';
 import { jobOfferQuerySchema, jobOfferSchema } from '../schemas/jobOfferSchema';
-import { BuildFilter } from '../types/jobOffer';
+import { BuildFilter, FindJobOfferQuery } from '../types/jobOffer';
 
 export const saveJobOffer = async (
   request: FastifyRequest,
   reply: FastifyReply
-): Promise<never> => {
-  try {
-    if (!request.body)
-      return reply.code(StatusCodes.BAD_REQUEST).send({ error: 'Job offer data is required' });
+): Promise<FastifyReply> => {
+  if (!request.body) throw new MissingBodyError();
 
-    const { error, value } = jobOfferSchema.validate(request.body, { abortEarly: false });
+  const { error, value } = jobOfferSchema.validate(request.body, { abortEarly: false });
 
-    if (error)
-      return reply.code(StatusCodes.BAD_REQUEST).send({
-        error: 'Validation failed',
-        details: error.details.map((d) => d.message),
-      });
+  if (error) throw new ValidateSchemaError(error);
 
-    const saved = await new JobOffer(value).save();
+  const saved = await new JobOffer(value).save();
+  if (!saved) throw new SaveOfferError([value]);
 
-    if (!saved)
-      return reply
-        .code(StatusCodes.INTERNAL_SERVER_ERROR)
-        .send({ error: 'Failed to save job offer' });
+  const id = saved._id.toString();
+  if (!id) throw new GetIdError([saved]);
 
-    const id = saved._id.toString();
-
-    if (!id)
-      return reply
-        .code(StatusCodes.INTERNAL_SERVER_ERROR)
-        .send({ error: 'Failed to retrieve job offer ID' });
-
-    return reply.code(StatusCodes.CREATED).send({
-      message: 'Job offer saved successfully',
-      id: id,
-    });
-  } catch (err) {
-    return reply.code(StatusCodes.INTERNAL_SERVER_ERROR).send({
-      error: 'Error saving job offer',
-      details: `${err instanceof Error ? err.message : 'Unknown error'}`,
-    });
-  }
+  return reply.code(StatusCodes.CREATED).send({
+    message: 'Job offer saved successfully',
+    id: id,
+  });
 };
 
 export const findJobOffer = async (
   request: FastifyRequest,
   reply: FastifyReply
 ): Promise<never> => {
-  try {
-    const { error, value } = jobOfferQuerySchema.validate(request.query, { abortEarly: false });
+  const { error, value } = jobOfferQuerySchema.validate(request.query, { abortEarly: false });
 
-    if (error)
-      return reply.code(StatusCodes.BAD_REQUEST).send({
-        error: 'Invalid query parameters',
-        details: error.details.map((d) => d.message),
-      });
+  if (error) throw new ValidateSchemaError(error);
 
-    const { titleJob, employer, page = 1, limit = 10, sort = 'desc' } = value;
-    const skip = (page - 1) * limit;
-    const filters: BuildFilter = buildJobOfferFilters({ titleJob, employer });
+  const { page, limit, sort } = value as FindJobOfferQuery;
+  const skip: number = (page! - 1) * limit!;
 
-    const [offers, total] = await Promise.all([
-      JobOffer.find(filters)
-        .sort({ updatedAt: sort === 'asc' ? 1 : -1 })
-        .skip(skip)
-        .limit(limit),
-      JobOffer.countDocuments(filters),
-    ]);
+  const filters: BuildFilter = buildJobOfferFilters(value);
+  request.log.info({ filters }, 'Filters');
 
-    const totalPages = Math.ceil(total / limit);
+  const [offers, total] = await Promise.all([
+    JobOffer.find(filters)
+      .sort({ updatedAt: sort === 'asc' ? 1 : -1 })
+      .skip(skip)
+      .limit(limit!),
+    JobOffer.countDocuments(filters),
+  ]);
 
-    return reply.code(StatusCodes.OK).send({
-      total,
-      page,
-      totalPages,
-      results: offers,
-    });
-  } catch (err) {
-    return reply.code(StatusCodes.INTERNAL_SERVER_ERROR).send({
-      error: 'Error retrieving job offers',
-      details: err instanceof Error ? err.message : 'Unknown error',
-    });
-  }
+  const totalPages = Math.ceil(total / limit!);
+
+  return reply.code(StatusCodes.OK).send({
+    total,
+    page,
+    totalPages,
+    results: offers,
+  });
 };
